@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmos Explorer Login</title>
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+    
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo">
+                <i class="fas fa-globe-americas"></i>
+                <h1>COSMOS EXPLORER</h1>
+            </div>
+            <p class="subtitle">Explore the entire universe in real-time 3D</p>
+        </div>
+        
+        <div class="login-form">
+            <div class="input-group">
+                <label for="username"><i class="fas fa-user-astronaut"></i> Username</label>
+                <input type="text" id="username" placeholder="Enter any username" autocomplete="off">
+            </div>
+            
+            <div class="input-group">
+                <label for="password"><i class="fas fa-key"></i> Password</label>
+                <input type="password" id="password" placeholder="Any password works" autocomplete="off">
+                <small class="note">Note: This is a demo. All logins are accepted.</small>
+            </div>
+            
+            <button class="login-btn" onclick="login()">
+                <i class="fas fa-rocket"></i>
+                <span>LAUNCH EXPLORER</span>
+                <div class="pulse"></div>
+            </button>
+            
+            <div class="demo-info">
+                <h3><i class="fas fa-info-circle"></i> DEMO ACCESS</h3>
+                <p>You can enter any username and password to explore.</p>
+                <p>Once logged in, you'll experience:</p>
+                <ul>
+                    <li><i class="fas fa-star"></i> Full Solar System in real scale</li>
+                    <li><i class="fas fa-earth-americas"></i> Interactive Earth with real topography</li>
+                    <li><i class="fas fa-satellite"></i> Real-time orbital mechanics</li>
+                    <li><i class="fas fa-user-group"></i> See other explorers in real-time</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="number">1,235</div>
+                <div class="label">Explorers Online</div>
+            </div>
+            <div class="stat">
+                <div class="number">4.5B+</div>
+                <div class="label">Stars Rendered</div>
+            </div>
+            <div class="stat">
+                <div class="number">8</div>
+                <div class="label">Planets to Explore</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="floating-astronaut">
+        <i class="fas fa-user-astronaut"></i>
+    </div>
+    
+    <script src="js/login.js"></script>
+</body>
+</html>

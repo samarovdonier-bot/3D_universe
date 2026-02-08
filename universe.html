@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universe Explorer - Real-time 3D Cosmos</title>
+    <link rel="stylesheet" href="css/universe.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Three.js and libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.min.js"></script>
+</head>
+<body>
+    <!-- Canvas for 3D universe -->
+    <canvas id="universeCanvas"></canvas>
+    
+    <!-- Loading screen -->
+    <div id="loadingScreen">
+        <div class="loading-content">
+            <div class="spinner">
+                <div class="orbit"></div>
+                <div class="planet"></div>
+            </div>
+            <h2>INITIALIZING UNIVERSE</h2>
+            <p class="loading-text">Loading celestial bodies...</p>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <div class="loading-stats">
+                <div class="stat"><span id="loadedObjects">0</span>/8 Planets</div>
+                <div class="stat"><span id="loadedStars">0</span>/2.5M Stars</div>
+                <div class="stat"><span id="loadedTextures">0</span>/12 Textures</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- User Interface -->
+    <div class="ui-container">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="user-info">
+                <div class="avatar">
+                    <i class="fas fa-user-astronaut"></i>
+                </div>
+                <div class="user-details">
+                    <div class="username" id="usernameDisplay">Explorer</div>
+                    <div class="user-status">
+                        <span class="status-dot online"></span>
+                        <span>Connected to Universe</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="universe-time">
+                <i class="fas fa-clock"></i>
+                <span id="universeTime">Earth Time: Loading...</span>
+            </div>
+            
+            <div class="online-count">
+                <i class="fas fa-users"></i>
+                <span id="onlineCount">1,235</span> explorers online
+            </div>
+            
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Exit Universe
+            </button>
+        </div>
+        
+        <!-- Left Panel - Navigation -->
+        <div class="left-panel">
+            <h3><i class="fas fa-satellite"></i> SOLAR SYSTEM</h3>
+            <div class="planet-list">
+                <div class="planet-item active" data-planet="sun">
+                    <div class="planet-icon" style="background: #ffdd00;"></div>
+                    <span>Sun</span>
+                    <i class="fas fa-fire"></i>
+                </div>
+                <div class="planet-item" data-planet="mercury">
+                    <div class="planet-icon" style="background: #888888;"></div>
+                    <span>Mercury</span>
+                    <i class="fas fa-temperature-high"></i>
+                </div>
+                <div class="planet-item" data-planet="venus">
+                    <div class="planet-icon" style="background: #ffaa66;"></div>
+                    <span>Venus</span>
+                    <i class="fas fa-cloud"></i>
+                </div>
+                <div class="planet-item" data-planet="earth">
+                    <div class="planet-icon" style="background: #4488ff;"></div>
+                    <span>Earth</span>
+                    <i class="fas fa-globe-americas"></i>
+                </div>
+                <div class="planet-item" data-planet="mars">
+                    <div class="planet-icon" style="background: #ff6666;"></div>
+                    <span>Mars</span>
+                    <i class="fas fa-mountain"></i>
+                </div>
+                <div class="planet-item" data-planet="jupiter">
+                    <div class="planet-icon" style="background: #ffcc99;"></div>
+                    <span>Jupiter</span>
+                    <i class="fas fa-wind"></i>
+                </div>
+                <div class="planet-item" data-planet="saturn">
+                    <div class="planet-icon" style="background: #ffdd88;"></div>
+                    <span>Saturn</span>
+                    <i class="fas fa-ring-planet"></i>
+                </div>
+                <div class="planet-item" data-planet="uranus">
+                    <div class="planet-icon" style="background: #66ccff;"></div>
+                    <span>Uranus</span>
+                    <i class="fas fa-snowflake"></i>
+                </div>
+                <div class="planet-item" data-planet="neptune">
+                    <div class="planet-icon" style="background: #4466ff;"></div>
+                    <span>Neptune</span>
+                    <i class="fas fa-water"></i>
+                </div>
+            </div>
+            
+            <div class="view-mode">
+                <h4><i class="fas fa-eye"></i> VIEW MODE</h4>
+                <div class="mode-buttons">
+                    <button class="mode-btn active" data-mode="solar">Solar System</button>
+                    <button class="mode-btn" data-mode="galaxy">Galaxy View</button>
+                    <button class="mode-btn" data-mode="universe">Universe View</button>
+                </div>
+            </div>
+            
+            <div class="other-explorers">
+                <h4><i class="fas fa-user-group"></i> NEARBY EXPLORERS</h4>
+                <div id="explorersList">
+                    <!-- Will be populated by JavaScript -->
+                    <div class="explorer-item">
+                        <div class="explorer-avatar">A</div>
+                        <div class="explorer-info">
+                            <div class="explorer-name">Astro_John</div>
+                            <div class="explorer-location">Near Earth</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Panel - Planet Information -->
+        <div class="right-panel">
+            <div class="planet-info">
+                <h3><i class="fas fa-info-circle"></i> PLANET INFO</h3>
+                <div class="info-content">
+                    <div class="planet-header">
+                        <div class="planet-visual">
+                            <div class="planet-sphere" id="planetSphere"></div>
+                        </div>
+                        <div class="planet-title">
+                            <h2 id="planetName">Sun</h2>
+                            <div class="planet-type" id="planetType">G-type Main-sequence Star</div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Diameter</div>
+                            <div class="info-value" id="infoDiameter">1,392,700 km</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Mass</div>
+                            <div class="info-value" id="infoMass">1.989 × 10³⁰ kg</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Temperature</div>
+                            <div class="info-value" id="infoTemp">5,500°C</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Gravity</div>
+                            <div class="info-value" id="infoGravity">274 m/s²</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Distance from Sun</div>
+                            <div class="info-value" id="infoDistance">0 km</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Orbital Period</div>
+                            <div class="info-value" id="infoOrbit">N/A</div>
+                        </div>
+                    </div>
+                    
+                    <div class="planet-description" id="planetDescription">
+                        The Sun is the star at the center of our Solar System. It is a nearly perfect sphere of hot plasma, heated to incandescence by nuclear fusion reactions in its core.
+                    </div>
+                    
+                    <button class="teleport-btn" onclick="teleportToPlanet()">
+                        <i class="fas fa-location-arrow"></i>
+                        TELEPORT TO THIS PLANET
+                    </button>
+                </div>
+            </div>
+            
+            <div class="controls-panel">
+                <h4><i class="fas fa-gamepad"></i> CONTROLS</h4>
+                <div class="controls-grid">
+                    <div class="control-item">
+                        <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>
+                        <span>Move Camera</span>
+                    </div>
+                    <div class="control-item">
+                        <kbd>Mouse</kbd>
+                        <span>Look Around</span>
+                    </div>
+                    <div class="control-item">
+                        <kbd>Scroll</kbd>
+                        <span>Zoom In/Out</span>
+                    </div>
+                    <div class="control-item">
+                        <kbd>Space</kbd>
+                        <span>Fly Up</span>
+                    </div>
+                    <div class="control-item">
+                        <kbd>Shift</kbd>
+                        <span>Fly Down</span>
+                    </div>
+                    <div class="control-item">
+                        <kbd>F</kbd>
+                        <span>Focus Planet</span>
+                    </div>
+                    <div class="control-item">
+                        <kbd>1-9</kbd>
+                        <span>Select Planet</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Bar - Statistics -->
+        <div class="bottom-bar">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label">Camera Distance</div>
+                    <div class="stat-value" id="cameraDistance">0 AU</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Time Speed</div>
+                    <div class="stat-value">
+                        <span id="timeSpeed">1x</span>
+                        <input type="range" min="0" max="100" value="10" id="timeSlider">
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">FPS</div>
+                    <div class="stat-value" id="fpsCounter">60</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Rendered Objects</div>
+                    <div class="stat-value" id="renderedObjects">0</div>
+                </div>
+            </div>
+            
+            <button class="fullscreen-btn" onclick="toggleFullscreen()">
+                <i class="fas fa-expand"></i>
+                Fullscreen
+            </button>
+        </div>
+    </div>
+    
+    <!-- Notification System -->
+    <div id="notificationContainer"></div>
+    
+    <!-- Scripts -->
+    <script src="js/planets-data.js"></script>
+    <script src="js/universe.js"></script>
+    <!-- universe.html fayliga qo'shing -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+<!-- universe.html faylida scriptlarni TARTIBI muhim -->
+
+<!-- 1. Avval planets-data.js -->
+<script src="js/planets-data.js"></script>
+
+<!-- 2. Keyin universe.js -->
+<script src="js/universe.js"></script>
+
+<!-- 3. Three.js kutubxonalari (CDN) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+</body>
+</html>
